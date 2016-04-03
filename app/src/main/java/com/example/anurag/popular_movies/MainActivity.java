@@ -45,11 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.new_movies) {
-            startActivity(new Intent(this, MostPopular.class));
+            startActivity(new Intent(this, NewMovies.class));
             return true;
         }
         if(id == R.id.sort_by_popularity) {
-            startActivity(new Intent(this, NewMovies.class));
+            startActivity(new Intent(this, MostPopular.class));
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
