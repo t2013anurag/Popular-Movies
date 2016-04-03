@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MostPopular"
+            android:name=".MostPopularActivity"
             android:label="@string/sort_by_popularity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
@@ -27,7 +27,7 @@
                 android:value="com.example.anurag.popular_movies.MainActivity" />
         </activity>
         <activity
-            android:name=".NewMovies"
+            android:name=".NewMoviesActivity"
             android:label="@string/new_movies"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">

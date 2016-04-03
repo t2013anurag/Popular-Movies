@@ -13,7 +13,7 @@ import java.util.zip.Inflater;
 /**
  * Created by anurag on 3/4/16.
  */
-public class MostPopular extends AppCompatActivity {
+public class MostPopularActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -26,11 +26,11 @@ public class MostPopular extends AppCompatActivity {
 
         int id = item.getItemId();
         if(id == R.id.new_movies) {
-            startActivity(new Intent(this, NewMovies.class));
+            startActivity(new Intent(this, NewMoviesActivity.class));
             return true;
         }
         if(id == R.id.sort_by_popularity) {
-            startActivity(new Intent(this, MostPopular.class));
+            startActivity(new Intent(this, MostPopularActivity.class));
             return  true;
         }
         return super.onOptionsItemSelected(item);
