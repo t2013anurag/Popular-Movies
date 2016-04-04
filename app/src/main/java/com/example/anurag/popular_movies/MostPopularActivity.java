@@ -51,7 +51,7 @@ public class MostPopularActivity extends ArrayAdapter<GridItem> {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             convertView = inflater.inflate(layoutResource, parent, false);
             holder = new ViewHolder();
-            holder.titleTextView = (TextView) convertView.findViewById(R.id.grid_item_title);
+            //holder.titleTextView = (TextView) convertView.findViewById(R.id.grid_item_title);
             holder.imageView = (ImageView) convertView.findViewById(R.id.grid_item_image);
             convertView.setTag(holder);
 
@@ -60,7 +60,7 @@ public class MostPopularActivity extends ArrayAdapter<GridItem> {
         }
 
         GridItem item = gridData.get(position);
-        //holder.titleTextView.setText(item.getTitle());
+//        holder.titleTextView.setText(item.getTitle());
         Picasso.with(context)
                 .load(item.getImage())
                 .into(holder.imageView);
