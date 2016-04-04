@@ -1,17 +1,50 @@
 package com.example.anurag.popular_movies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.AdapterView;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private GridView gridView;
+    private ProgressBar progressBar;
+
+    private MostPopularActivity popularAdapter;
+    private ArrayList<GridItem> gridData;
+    private String base_URL =   "http://api.themoviedb.org/3/movie/popular";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,14 +53,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        gridView = (GridView) findViewById(R.id.gridView);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        //Initializing the empty data
+        gridData = new ArrayList<>();
+        popularAdapter = new MostPopularActivity(this, R.layout.grid_item, gridData);
+
+        //Starting to get the data from api
+        new FetchMovies().execute(base_URL);
+        progressBar.setVisibility(View.VISIBLE);
+
     }
 
     @Override
@@ -55,5 +91,95 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public class FetchMovies extends AsyncTask<String, Void, String[]> {
+
+        private final String LOG_TAG = FetchMovies.class.getSimpleName();
+
+
+        private String[] getMovieDataFromJson(String moviesJsonstr)throws JSONException {
+            String[] resultStr = new String[2];
+            Log.v(LOG_TAG, "resut is " + moviesJsonstr);
+            return resultStr;
+        }
+
+        @Override
+        protected String[] doInBackground(String... params) {
+           if(params.length == 0) {
+               return null;
+           }
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            String moviesJsonstr = null;
+            String format = "json";
+            String api_key = "66b412b7f7a1aa11e0ae6e6871ad7d04";
+            try {
+                final String FEED_URL = "http://api.themoviedb.org/3/movie/popular?";
+                final String API = "api_key";
+
+                Uri builtUri = Uri.parse(FEED_URL).buildUpon()
+                        .appendQueryParameter(API, api_key)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+                Log.v(LOG_TAG, "build url " + builtUri.toString());
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if(inputStream == null) {
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+
+                while ((line = reader.readLine())!= null) {
+                    buffer.append(line + "\n");
+                }
+                if(buffer.length() == 0) {
+                    return null;
+                }
+                moviesJsonstr = buffer.toString();
+                Log.v(LOG_TAG, " json received is " + moviesJsonstr);
+
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error", e);
+                return null;
+            } finally {
+                if(urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if(reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream ", e);
+                    }
+                }
+            }
+            try {
+                return getMovieDataFromJson(moviesJsonstr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+                if(result != null) {
+                    popularAdapter.setGridData(gridData);
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to fetch movies!", Toast.LENGTH_SHORT).show();
+                }
+            progressBar.setVisibility(View.GONE);
+        }
     }
 }
