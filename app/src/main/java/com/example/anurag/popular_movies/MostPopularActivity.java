@@ -41,17 +41,15 @@ public class MostPopularActivity extends ArrayAdapter<GridItem> {
 
     public void setGridData(ArrayList<GridItem> gridData) {
         this.gridData = gridData;
-        Log.v(LOG_TAG,"grid data" + gridData);
         notifyDataSetChanged();
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.v(LOG_TAG, "it comes here");
         ViewHolder holder;
 
         if(convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.content_main, null);
-
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            convertView = inflater.inflate(layoutResource, parent, false);
             holder = new ViewHolder();
             holder.titleTextView = (TextView) convertView.findViewById(R.id.grid_item_title);
             holder.imageView = (ImageView) convertView.findViewById(R.id.grid_item_image);
@@ -59,13 +57,10 @@ public class MostPopularActivity extends ArrayAdapter<GridItem> {
 
         } else {
             holder = (ViewHolder) convertView.getTag();
-            Log.v(LOG_TAG, "Something else");
         }
 
         GridItem item = gridData.get(position);
-        holder.titleTextView.setText(Html.fromHtml(item.getTitle()));
-        Log.v(LOG_TAG, "sone text " + item.getImage());
-        Log.v(LOG_TAG, "Soe" + item.getTitle());
+        //holder.titleTextView.setText(item.getTitle());
         Picasso.with(context)
                 .load(item.getImage())
                 .into(holder.imageView);

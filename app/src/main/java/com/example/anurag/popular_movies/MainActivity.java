@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MostPopularActivity popularAdapter;
     private ArrayList<GridItem> gridData;
-    private String base_URL =   "http://api.themoviedb.org/3/movie/popular";
+    private String base_URL =  "http://api.themoviedb.org/3/movie/popular";
 
 
     @Override
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         //Initializing the empty data
         gridData = new ArrayList<>();
         popularAdapter = new MostPopularActivity(this, R.layout.grid_item, gridData);
+        gridView.setAdapter(popularAdapter);
 
         //Starting to get the data from api
         new FetchMovies().execute(base_URL);
@@ -188,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
                 if(result == 1) {
-                    Log.v(LOG_TAG, "content before sending " + gridData);
                     popularAdapter.setGridData(gridData);
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to fetch movies!", Toast.LENGTH_SHORT).show();
