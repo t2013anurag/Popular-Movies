@@ -101,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.new_movies) {
+        if (id == R.id.most_popular) {
             base_URL = "http://api.themoviedb.org/3/movie/popular";
             new FetchMovies().execute(base_URL);
             progressBar.setVisibility(View.VISIBLE);
             gridData.clear();
             return true;
         }
-        if(id == R.id.sort_by_popularity) {
+        if(id == R.id.highest_rated) {
             base_URL = "http://api.themoviedb.org/3/movie/top_rated";
             new FetchMovies().execute(base_URL);
             progressBar.setVisibility(View.VISIBLE);
@@ -137,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
                 String releaseDate = result.getString("release_date");
                 String rating = result.getString("vote_average");
                 poster_path = "http://image.tmdb.org/t/p/w185/" + poster_path;
-                Log.v(LOG_TAG, "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
-                + "rating" + rating);
+//                Log.v(LOG_TAG, "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
+//                + "rating" + rating);
                 item = new GridItem();
                 item.setTitle(title);
                 item.setImage(poster_path);
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
             String moviesJsonstr = null;
             String format = "json";
-            String api_key = "66b412b7f7a1aa11e0ae6e6871ad7d04";
+            String api_key = "MyAPIKEY";
             try {
                 String FEED_URL = params[0];
                 FEED_URL = FEED_URL+"?";
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                         .build();
 
                 URL url = new URL(builtUri.toString());
-                Log.v(LOG_TAG, "build url " + builtUri.toString());
+//                Log.v(LOG_TAG, "build url " + builtUri.toString());
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
