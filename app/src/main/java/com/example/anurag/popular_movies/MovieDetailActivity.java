@@ -22,6 +22,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     private  final String LOG_TAG = MovieDetailActivity.class.getSimpleName();
     private TextView textView_movie_title;
     private ImageView textView_movie_poster;
+    private TextView textView_movie_rating;
+    private TextView textView_movie_releaseDate;
+    private TextView textView_movie_overview;
 
 
     @Override
@@ -38,10 +41,21 @@ public class MovieDetailActivity extends AppCompatActivity {
 
 
         textView_movie_poster = (ImageView) findViewById(R.id.movie_poster);
+        Picasso.with(this).load(image).into(textView_movie_poster);
+
         textView_movie_title = (TextView) findViewById(R.id.movie_title);
         textView_movie_title.setText(title);
 
-        Picasso.with(this).load(image).into(textView_movie_poster);
+        textView_movie_releaseDate = (TextView) findViewById(R.id.movie_releaseDate);
+        textView_movie_releaseDate.setText(release_date);
+
+        textView_movie_overview = (TextView) findViewById(R.id.movie_overview);
+        textView_movie_overview.setText(overview);
+
+        textView_movie_rating = (TextView) findViewById(R.id.movie_ratings);
+        textView_movie_rating.setText(rating);
+
+
     }
 
 }
