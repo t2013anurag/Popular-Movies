@@ -83,11 +83,17 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.new_movies) {
-            startActivity(new Intent(this, NewMoviesActivity.class));
+            base_URL = "http://api.themoviedb.org/3/movie/popular";
+            new FetchMovies().execute(base_URL);
+            progressBar.setVisibility(View.VISIBLE);
+            gridData.clear();
             return true;
         }
         if(id == R.id.sort_by_popularity) {
-            startActivity(new Intent(this, MostPopularActivity.class));
+            base_URL = "http://api.themoviedb.org/3/movie/top_rated";
+            new FetchMovies().execute(base_URL);
+            progressBar.setVisibility(View.VISIBLE);
+            gridData.clear();
             return true;
         }
 
@@ -130,7 +136,8 @@ public class MainActivity extends AppCompatActivity {
             String format = "json";
             String api_key = "66b412b7f7a1aa11e0ae6e6871ad7d04";
             try {
-                final String FEED_URL = "http://api.themoviedb.org/3/movie/popular?";
+                String FEED_URL = params[0];
+                FEED_URL = FEED_URL+"?";
                 final String API = "api_key";
 
                 Uri builtUri = Uri.parse(FEED_URL).buildUpon()
