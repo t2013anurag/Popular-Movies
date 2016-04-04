@@ -94,19 +94,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class FetchMovies extends AsyncTask<String, Void, String[]> {
+    public class FetchMovies extends AsyncTask<String, Void, Integer> {
 
         private final String LOG_TAG = FetchMovies.class.getSimpleName();
 
 
-        private String[] getMovieDataFromJson(String moviesJsonstr)throws JSONException {
-            String[] resultStr = new String[2];
-            Log.v(LOG_TAG, "resut is " + moviesJsonstr);
-            return resultStr;
+        private void getMovieDataFromJson(String moviesJsonstr)throws JSONException {
+            JSONObject moviesJson = new JSONObject(moviesJsonstr);
+            JSONArray moviesArray = moviesJson.getJSONArray("results");
+            GridItem item;
+            for(int i=0; i<moviesArray.length(); i++) {
+                JSONObject result = moviesArray.getJSONObject(i);
+                String title = result.getString("original_title");
+                String poster_path = result.getString("poster_path");
+                poster_path = "http://image.tmdb.org/t/p/w185/" + poster_path;
+                Log.v(LOG_TAG, "title " + title + "path " + poster_path);
+                item = new GridItem();
+                item.setTitle(title);
+                item.setImage(poster_path);
+                gridData.add(item);
+            }
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Integer doInBackground(String... params) {
+            Integer result = 0;
            if(params.length == 0) {
                return null;
            }
@@ -147,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 moviesJsonstr = buffer.toString();
                 Log.v(LOG_TAG, " json received is " + moviesJsonstr);
+                result = 1;
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error", e);
@@ -164,17 +177,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             try {
-                return getMovieDataFromJson(moviesJsonstr);
+               getMovieDataFromJson(moviesJsonstr);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
-            return null;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
-                if(result != null) {
+        protected void onPostExecute(Integer result) {
+                if(result == 1) {
+                    Log.v(LOG_TAG, "content before sending " + gridData);
                     popularAdapter.setGridData(gridData);
                 } else {
                     Toast.makeText(MainActivity.this, "Failed to fetch movies!", Toast.LENGTH_SHORT).show();
