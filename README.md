@@ -8,7 +8,7 @@ v1.0 :
       Only activities declared.
 
 v1.1 : 
-Stage of Project completed.
+Stage 1 of Project completed.
 Features : 
 
       1. Display the movies on Most Popular or Highest order.
