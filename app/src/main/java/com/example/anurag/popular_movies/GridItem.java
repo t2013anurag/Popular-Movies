@@ -6,6 +6,9 @@ package com.example.anurag.popular_movies;
 public class GridItem {
     private String image;
     private String title;
+    private String releaseDate;
+    private String vote_average;
+    private String overview;
 
     public GridItem() {
         super();
@@ -26,4 +29,29 @@ public class GridItem {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public String getVote_average() {
+        return vote_average;
+    }
+
+    public  void  setVote_average(String vote_average) {
+        this.vote_average = vote_average;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
+
 }

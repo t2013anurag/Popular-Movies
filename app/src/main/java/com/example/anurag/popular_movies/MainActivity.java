@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.AdapterView;
 import java.io.BufferedReader;
@@ -37,12 +38,12 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private  final String LOG_TAG = MainActivity.class.getSimpleName();
     private GridView gridView;
-    private ProgressBar progressBar;
+    private  ProgressBar progressBar;
 
-    private MostPopularActivity popularAdapter;
-    private ArrayList<GridItem> gridData;
+    private  MostPopularActivity popularAdapter;
+    private  ArrayList<GridItem> gridData;
     private String base_URL =  "http://api.themoviedb.org/3/movie/popular";
 
 
@@ -60,6 +61,24 @@ public class MainActivity extends AppCompatActivity {
         gridData = new ArrayList<>();
         popularAdapter = new MostPopularActivity(this, R.layout.grid_item, gridData);
         gridView.setAdapter(popularAdapter);
+
+        //Starting item on click event
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GridItem item = (GridItem) parent.getItemAtPosition(position);
+                Intent intent = new Intent(MainActivity.this, MovieDetailActivity.class);
+
+                ImageView imageView = (ImageView) view.findViewById(R.id.grid_item_image);
+                intent.putExtra("image", item.getImage())
+                        .putExtra("overview", item.getOverview())
+                        .putExtra("title", item.getTitle())
+                        .putExtra("release_date", item.getReleaseDate())
+                        .putExtra("rating", item.getVote_average());
+
+                startActivity(intent);
+            }
+        });
 
         //Starting to get the data from api
         new FetchMovies().execute(base_URL);
@@ -114,11 +133,18 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject result = moviesArray.getJSONObject(i);
                 String title = result.getString("original_title");
                 String poster_path = result.getString("poster_path");
+                String overview = result.getString("overview");
+                String releaseDate = result.getString("release_date");
+                String rating = result.getString("vote_average");
                 poster_path = "http://image.tmdb.org/t/p/w185/" + poster_path;
-                Log.v(LOG_TAG, "title " + title + "path " + poster_path);
+                Log.v(LOG_TAG, "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
+                + "rating" + rating);
                 item = new GridItem();
                 item.setTitle(title);
                 item.setImage(poster_path);
+                item.setReleaseDate(releaseDate);
+                item.setOverview(overview);
+                item.setVote_average(rating);
                 gridData.add(item);
             }
         }
