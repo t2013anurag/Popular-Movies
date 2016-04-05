@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
             String moviesJsonstr = null;
             String format = "json";
-            String api_key = "MyAPIKEY";
+            String api_key = "66b412b7f7a1aa11e0ae6e6871ad7d04";
             try {
                 String FEED_URL = params[0];
                 FEED_URL = FEED_URL+"?";
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                     return null;
                 }
                 moviesJsonstr = buffer.toString();
-                Log.v(LOG_TAG, " json received is " + moviesJsonstr);
+              //  Log.v(LOG_TAG, " json received is " + moviesJsonstr);
                 result = 1;
 
             } catch (IOException e) {
