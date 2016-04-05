@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                 if(result == 1) {
                     popularAdapter.setGridData(gridData);
                 } else {
-                    Toast.makeText(MainActivity.this, "Failed to fetch movies!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Failed to fetch movies! Check connection", Toast.LENGTH_SHORT).show();
                 }
             progressBar.setVisibility(View.GONE);
         }
