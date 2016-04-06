@@ -39,19 +39,23 @@ public class MovieDetailActivity extends AppCompatActivity {
         String release_date = bundle.getString("release_date");
         String rating = bundle.getString("rating");
 
-
+        // poster image
         textView_movie_poster = (ImageView) findViewById(R.id.movie_poster);
         Picasso.with(this).load(image).into(textView_movie_poster);
 
+        // title
         textView_movie_title = (TextView) findViewById(R.id.movie_title);
         textView_movie_title.setText(title);
 
+        // release date
         textView_movie_releaseDate = (TextView) findViewById(R.id.movie_releaseDate);
         textView_movie_releaseDate.setText(release_date);
 
+        // overview
         textView_movie_overview = (TextView) findViewById(R.id.movie_overview);
         textView_movie_overview.setText(overview);
 
+        // rating
         textView_movie_rating = (TextView) findViewById(R.id.movie_ratings);
         textView_movie_rating.setText(rating);
 
