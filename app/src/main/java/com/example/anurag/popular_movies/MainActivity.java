@@ -120,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
     public class FetchMovies extends AsyncTask<String, Void, Integer> {
 
         private final String LOG_TAG = FetchMovies.class.getSimpleName();
-
-
+        
         private void getMovieDataFromJson(String moviesJsonstr)throws JSONException {
             JSONObject moviesJson = new JSONObject(moviesJsonstr);
             JSONArray moviesArray = moviesJson.getJSONArray("results");
