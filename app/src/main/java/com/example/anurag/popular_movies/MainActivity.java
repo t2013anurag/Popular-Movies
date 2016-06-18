@@ -1,9 +1,15 @@
 package com.example.anurag.popular_movies;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -19,20 +25,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import android.content.Intent;
+
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,10 +40,15 @@ public class MainActivity extends AppCompatActivity {
     private GridView gridView;
     private  ProgressBar progressBar;
 
-    private  MostPopularActivity popularAdapter;
+    private MostPopularAdapter popularAdapter;
     private  ArrayList<GridItem> gridData;
     private String base_URL =  "http://api.themoviedb.org/3/movie/popular";
 
+    DbHelp dbHelp;
+    SQLiteDatabase db;
+
+
+    SwipeRefreshLayout swipeRefreshLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,12 +56,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        dbHelp = new DbHelp(this);
+        db = dbHelp.getWritableDatabase();
+
+
         gridView = (GridView) findViewById(R.id.gridView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
 
         //Initializing the empty data
         gridData = new ArrayList<>();
-        popularAdapter = new MostPopularActivity(this, R.layout.grid_item, gridData);
+        popularAdapter = new MostPopularAdapter(this, R.layout.grid_item, gridData);
         gridView.setAdapter(popularAdapter);
 
         //Starting item on click event
@@ -78,9 +88,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Starting to get the data from api
-        new FetchMovies().execute(base_URL);
+        //new FetchMovies().execute(base_URL);
+
+
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                gridData.clear();
+                if(isNetworkConnected())
+                new FetchMovies().execute(base_URL);
+                else {
+                    Snackbar.make(gridView, "NO net", Snackbar.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
+
         progressBar.setVisibility(View.VISIBLE);
 
+        fetchFromDb();
     }
 
     @Override
@@ -120,21 +147,22 @@ public class MainActivity extends AppCompatActivity {
     public class FetchMovies extends AsyncTask<String, Void, Integer> {
 
         private final String LOG_TAG = FetchMovies.class.getSimpleName();
-        
+
         private void getMovieDataFromJson(String moviesJsonstr)throws JSONException {
             JSONObject moviesJson = new JSONObject(moviesJsonstr);
             JSONArray moviesArray = moviesJson.getJSONArray("results");
             GridItem item;
             for(int i=0; i<moviesArray.length(); i++) {
                 JSONObject result = moviesArray.getJSONObject(i);
+                String id = result.getString("id");
                 String title = result.getString("original_title");
                 String poster_path = result.getString("poster_path");
                 String overview = result.getString("overview");
                 String releaseDate = result.getString("release_date");
                 String rating = result.getString("vote_average");
                 poster_path = "http://image.tmdb.org/t/p/w185/" + poster_path;
-//                Log.v(LOG_TAG, "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
-//                + "rating" + rating);
+                Log.v(LOG_TAG, "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
+                + "rating" + rating);
                 item = new GridItem();
                 item.setTitle(title);
                 item.setImage(poster_path);
@@ -142,6 +170,22 @@ public class MainActivity extends AppCompatActivity {
                 item.setOverview(overview);
                 item.setVote_average(rating);
                 gridData.add(item);
+
+
+                Cursor c = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME +" WHERE " + DatabaseConstants.MOVIE_ID
+                + " IS " + id,  null);
+
+                if(!c.moveToFirst()) {
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(DatabaseConstants.MOVIE_ID, id);
+                    contentValues.put(DatabaseConstants.MOVIE_TITLE, title);
+                    contentValues.put(DatabaseConstants.MOVIE_POSTER, poster_path);
+                    contentValues.put(DatabaseConstants.MOVIE_OVERVIEW, overview);
+                    contentValues.put(DatabaseConstants.MOVIE_RELEASEDATE, releaseDate);
+                    contentValues.put(DatabaseConstants.MOVIE_RATING, rating);
+                    db.insert(DatabaseConstants.TABLE_NAME, DatabaseConstants.MOVIE_ID, contentValues);
+                }
+                c.close();
             }
         }
 
@@ -223,6 +267,51 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Failed to fetch movies! Check connectivity", Toast.LENGTH_SHORT).show();
                 }
             progressBar.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+
+
+
+    // db waala kaam
+    public void fetchFromDb(){
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME ,null );
+        GridItem item;
+        gridData.clear();
+        if(cursor.moveToFirst()){
+
+
+            do {
+
+
+                String title = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_TITLE));
+                String poster_path = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_POSTER));
+                String releaseDate = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_RELEASEDATE));
+                String overview = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_OVERVIEW));
+                String rating = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_RATING));
+
+                item = new GridItem();
+                item.setTitle(title);
+                item.setImage(poster_path);
+                item.setReleaseDate(releaseDate);
+                item.setOverview(overview);
+                item.setVote_average(rating);
+                gridData.add(item);
+            }while (cursor.moveToNext());
+            cursor.close();
+            popularAdapter.setGridData(gridData);
+            progressBar.setVisibility(View.GONE);
+
+        }else
+            new FetchMovies().execute(base_URL);
+    }
+
+
+
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 }
