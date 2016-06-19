@@ -76,8 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 GridItem item = (GridItem) parent.getItemAtPosition(position);
                 Intent intent = new Intent(MainActivity.this, MovieDetailActivity.class);
 
-                ImageView imageView = (ImageView) view.findViewById(R.id.grid_item_image);
-                intent.putExtra("image", item.getImage())
+                Log.e("BFd",item.getId()+" ");
+
+                intent.putExtra("movie_id", item.getId())
+                        .putExtra("image", item.getImage())
                         .putExtra("overview", item.getOverview())
                         .putExtra("title", item.getTitle())
                         .putExtra("release_date", item.getReleaseDate())
@@ -99,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 if(isNetworkConnected())
                 new FetchMovies().execute(base_URL);
                 else {
-                    Snackbar.make(gridView, "NO net", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(gridView, "Couldn't refresh feed. Please check your internet connection!", Snackbar.LENGTH_SHORT).show();
                     swipeRefreshLayout.setRefreshing(false);
                 }
             }
@@ -148,22 +150,29 @@ public class MainActivity extends AppCompatActivity {
 
         private final String LOG_TAG = FetchMovies.class.getSimpleName();
 
+        /*
+        0 mov
+        1 tra
+        2 rev
+         */
+
         private void getMovieDataFromJson(String moviesJsonstr)throws JSONException {
             JSONObject moviesJson = new JSONObject(moviesJsonstr);
             JSONArray moviesArray = moviesJson.getJSONArray("results");
             GridItem item;
             for(int i=0; i<moviesArray.length(); i++) {
                 JSONObject result = moviesArray.getJSONObject(i);
-                String id = result.getString("id");
+                String movie_id = result.getString("id");
                 String title = result.getString("original_title");
                 String poster_path = result.getString("poster_path");
                 String overview = result.getString("overview");
                 String releaseDate = result.getString("release_date");
                 String rating = result.getString("vote_average");
                 poster_path = "http://image.tmdb.org/t/p/w185/" + poster_path;
-                Log.v(LOG_TAG, "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
+                Log.v(LOG_TAG, movie_id + "title " + title + "path " + poster_path + "overview" + overview + "release" + releaseDate
                 + "rating" + rating);
                 item = new GridItem();
+                item.setId(movie_id);
                 item.setTitle(title);
                 item.setImage(poster_path);
                 item.setReleaseDate(releaseDate);
@@ -173,11 +182,11 @@ public class MainActivity extends AppCompatActivity {
 
 
                 Cursor c = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME +" WHERE " + DatabaseConstants.MOVIE_ID
-                + " IS " + id,  null);
+                + " IS " + movie_id,  null);
 
                 if(!c.moveToFirst()) {
                     ContentValues contentValues = new ContentValues();
-                    contentValues.put(DatabaseConstants.MOVIE_ID, id);
+                    contentValues.put(DatabaseConstants.MOVIE_ID, movie_id);
                     contentValues.put(DatabaseConstants.MOVIE_TITLE, title);
                     contentValues.put(DatabaseConstants.MOVIE_POSTER, poster_path);
                     contentValues.put(DatabaseConstants.MOVIE_OVERVIEW, overview);
@@ -274,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    // db waala kaam
+    // Database methods
     public void fetchFromDb(){
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME ,null );
         GridItem item;
@@ -284,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
 
             do {
 
-
+                String id = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_ID));
                 String title = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_TITLE));
                 String poster_path = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_POSTER));
                 String releaseDate = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_RELEASEDATE));
@@ -292,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
                 String rating = cursor.getString(cursor.getColumnIndex(DatabaseConstants.MOVIE_RATING));
 
                 item = new GridItem();
+                item.setId(id);
                 item.setTitle(title);
                 item.setImage(poster_path);
                 item.setReleaseDate(releaseDate);
@@ -309,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+// Checking if the user is connected to internet, if yes return true else false
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null;

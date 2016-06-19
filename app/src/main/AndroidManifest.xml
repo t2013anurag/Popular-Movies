@@ -2,10 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.anurag.popular_movies">
 
-
     <!-- Asking for user permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +18,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -31,6 +31,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.anurag.popular_movies.MainActivity" />
         </activity>
+        <activity android:name=".RatingsActivity"></activity>
     </application>
 
 </manifest>

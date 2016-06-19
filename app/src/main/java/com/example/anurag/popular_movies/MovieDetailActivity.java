@@ -11,6 +11,8 @@ import android.view.View;
 import com.squareup.picasso.Picasso;
 
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,6 +22,8 @@ import android.widget.TextView;
  */
 public class MovieDetailActivity extends AppCompatActivity {
     private  final String LOG_TAG = MovieDetailActivity.class.getSimpleName();
+
+    private Button reviews;
     private TextView textView_movie_title;
     private ImageView textView_movie_poster;
     private TextView textView_movie_rating;
@@ -33,11 +37,28 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.movie_layout);
         Bundle bundle = getIntent().getExtras();
 
+        final String movie_id = bundle.getString("movie_id");
         String image = bundle.getString("image");
         String overview = bundle.getString("overview");
-        String title = bundle.getString("title");
+        final String title = bundle.getString("title");
         String release_date = bundle.getString("release_date");
         String rating = bundle.getString("rating");
+        Log.e("BFd22",movie_id+" ");
+
+        reviews = (Button) findViewById(R.id.reviews);
+        reviews.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+//                TextView textView = (Button) textView.findViewById();
+                Intent intent = new Intent(MovieDetailActivity.this,RatingsActivity.class);
+                intent.putExtra("movie_id",movie_id);
+                intent.putExtra("title",title);
+                startActivity(intent);
+                
+
+            }
+        });
+
+
 
         // poster image
         textView_movie_poster = (ImageView) findViewById(R.id.movie_poster);

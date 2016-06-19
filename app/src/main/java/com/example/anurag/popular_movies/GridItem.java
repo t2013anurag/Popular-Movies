@@ -10,10 +10,20 @@ public class GridItem {
     private String releaseDate;
     private String vote_average;
     private String overview;
+    private String movie_id;
 
     public GridItem() {
         super();
     }
+
+    public String getId() {
+        return movie_id;
+    }
+
+    public void setId(String id) {
+        this.movie_id = id;
+    }
+
 
     public String getImage() {
         return image;
